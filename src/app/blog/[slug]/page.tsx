@@ -181,7 +181,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             <footer className="border-t border-border/40 mt-20">
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8">
                     <p className="text-sm text-muted-foreground">
-                        © 2025 Torres. Todos los derechos reservados.
+                        © 2026 Iván Torres. Todos los derechos reservados.
                     </p>
                 </div>
             </footer>

@@ -119,7 +119,7 @@ Esta herramienta te da un resumen de alto nivel de tu CSS, incluyendo todas las 
 3.  Selecciona **"CSS Overview"** (o "Vista general del CSS").
 4.  Haz clic en el botón **"Capture overview"**.
 
-![Panel CSS Overview mostrando Media Queries](C:/Users/Torres/.gemini/antigravity/brain/43b9bddc-af5c-406e-874d-8bb0a064dada/uploaded_image_1765310014769.png)
+![Panel CSS Overview mostrando Media Queries](/uploaded_image_1765310014769.png)
 
 **¿Qué buscar?**
 En la sección **Media queries**, verás un listado de todos los breakpoints. Si ves breakpoints complejos o redundantes, es una señal de que necesitas organizar mejor tus archivos. Además, te permite ver rápidamente si estás cargando lógica de escritorio en una vista móvil.

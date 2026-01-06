@@ -20,7 +20,7 @@ export default function Home() {
 
           <div className="space-y-6">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              Hola, soy <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">Torres</span>
+              Hola, soy <span className="text-primary">Iván Torres</span>
             </h1>
 
             <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
@@ -105,7 +105,7 @@ export default function Home() {
       <footer className="border-t border-border/40">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-8">
           <p className="text-sm text-muted-foreground">
-            © 2025 Torres. Todos los derechos reservados.
+            © 2026 Iván Torres. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-6">
             <Link href="/rss" className="text-sm text-muted-foreground hover:text-foreground">

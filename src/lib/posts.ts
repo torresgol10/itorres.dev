@@ -70,7 +70,7 @@ export function getPostBySlug(slug: string): Post | null {
         image: data.image || "",
         imageAlt: data.imageAlt || data.title || "Blog post image",
         author: data.author || {
-            name: "Torres",
+            name: "Iván Torres",
             role: "Software Developer",
             avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
         },

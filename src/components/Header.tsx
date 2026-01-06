@@ -33,7 +33,7 @@ export function Header({ tocItems }: HeaderProps) {
 
                     <nav className="hidden items-center gap-8 md:flex">
                         <Link
-                            href="/"
+                            href="/blog"
                             className="text-sm font-medium text-foreground transition-colors hover:text-primary"
                         >
                             Blog
@@ -68,7 +68,7 @@ export function Header({ tocItems }: HeaderProps) {
                 <div className="fixed inset-0 top-16 z-40 bg-background md:hidden">
                     <nav className="border-b border-border px-6 py-4">
                         <Link
-                            href="/"
+                            href="/blog"
                             onClick={() => setIsMenuOpen(false)}
                             className="block py-2 text-lg font-medium"
                         >
