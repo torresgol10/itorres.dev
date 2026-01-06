@@ -1,0 +1,63 @@
+---
+title: "Getting Started with Next.js 14"
+date: "2025-12-04"
+category: "Next.js"
+excerpt: "Aprende los fundamentos del App Router, Server Components y Client Components en Next.js 14."
+image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=600&fit=crop"
+author:
+  name: "Torres"
+  role: "Software Developer"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+---
+
+Next.js 14 introduces a stable App Router, which changes how we think about building React applications. It leverages React Server Components to reduce the amount of JavaScript sent to the client.
+
+## Server Components
+
+By default, all components in the App Router are Server Components. This means they render on the server and send HTML to the client. This is a fundamental shift from the traditional client-side React approach.
+
+```tsx
+// app/page.tsx
+export default async function Page() {
+  // Puedes hacer fetch directamente sin useEffect
+  const data = await fetch('https://api.example.com/data')
+  const posts = await data.json()
+ 
+  return (
+    <main>
+      {posts.map((post) => (
+        <article key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.excerpt}</p>
+        </article>
+      ))}
+    </main>
+  )
+}
+```
+
+This is a game changer for performance and SEO. You can fetch data directly in your components without useEffect or external libraries. The data fetching happens on the server, and only the resulting HTML is sent to the client.
+
+## Client Components
+
+When you need interactivity, you can opt into Client Components using the `"use client"` directive at the top of your file.
+
+```tsx
+"use client"
+
+import { useState } from 'react'
+
+export function Counter() {
+  const [count, setCount] = useState(0)
+  
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Count: {count}
+    </button>
+  )
+}
+```
+
+## Conclusión
+
+Next.js 14 representa un gran paso adelante en el desarrollo de aplicaciones React. La combinación de Server Components y Client Components te da lo mejor de ambos mundos: rendimiento óptimo y total interactividad.

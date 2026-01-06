@@ -1,0 +1,58 @@
+---
+title: "Introducción a TypeScript"
+date: "2025-11-25"
+category: "TypeScript"
+excerpt: "Descubre por qué TypeScript se ha convertido en el estándar para proyectos JavaScript modernos."
+image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=400&fit=crop"
+author:
+  name: "Torres"
+  role: "Software Developer"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+---
+
+TypeScript añade tipado estático a JavaScript, ayudándote a detectar errores antes de ejecutar tu código.
+
+## Tipos Básicos
+
+TypeScript ofrece tipos primitivos y complejos:
+
+```typescript
+// Primitivos
+let name: string = "Torres"
+let age: number = 28
+let isActive: boolean = true
+
+// Arrays
+let numbers: number[] = [1, 2, 3]
+let names: Array<string> = ["Ana", "Luis"]
+
+// Objetos
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+const user: User = {
+  id: 1,
+  name: "Torres",
+  email: "torres@example.com"
+}
+```
+
+## Genéricos
+
+Los genéricos permiten crear componentes reutilizables:
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg
+}
+
+const result = identity<string>("Hello")
+const num = identity<number>(42)
+```
+
+## Conclusión
+
+TypeScript mejora la mantenibilidad y reduce bugs. Es especialmente útil en proyectos grandes donde la documentación de tipos ayuda al equipo.

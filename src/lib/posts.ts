@@ -1,0 +1,124 @@
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+
+const postsDirectory = path.join(process.cwd(), "content/posts");
+
+export interface PostMeta {
+    slug: string;
+    title: string;
+    date: string;
+    category: string;
+    excerpt: string;
+    image: string;
+    author?: {
+        name: string;
+        role: string;
+        avatar: string;
+    };
+}
+
+export interface Post extends PostMeta {
+    content: string;
+}
+
+export interface TocItem {
+    id: string;
+    text: string;
+    level: number;
+}
+
+// Get all post slugs
+export function getPostSlugs(): string[] {
+    if (!fs.existsSync(postsDirectory)) {
+        return [];
+    }
+    return fs.readdirSync(postsDirectory).filter((file) => file.endsWith(".mdx"));
+}
+
+// Get post by slug
+export function getPostBySlug(slug: string): Post | null {
+    const realSlug = slug.replace(/\.mdx$/, "");
+    const fullPath = path.join(postsDirectory, `${realSlug}.mdx`);
+
+    if (!fs.existsSync(fullPath)) {
+        return null;
+    }
+
+    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const { data, content } = matter(fileContents);
+
+    return {
+        slug: realSlug,
+        title: data.title || "Untitled",
+        date: data.date || new Date().toISOString(),
+        category: data.category || "General",
+        excerpt: data.excerpt || "",
+        image: data.image || "",
+        author: data.author || {
+            name: "Torres",
+            role: "Software Developer",
+            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+        },
+        content,
+    };
+}
+
+// Get all posts sorted by date
+export function getAllPosts(): PostMeta[] {
+    const slugs = getPostSlugs();
+    const posts = slugs
+        .map((slug) => {
+            const post = getPostBySlug(slug.replace(/\.mdx$/, ""));
+            if (!post) return null;
+            // Return metadata only, not content
+            const { content, ...meta } = post;
+            return meta;
+        })
+        .filter((post): post is PostMeta => post !== null)
+        .sort((a, b) => (new Date(b.date) > new Date(a.date) ? 1 : -1));
+
+    return posts;
+}
+
+// Get related posts by category
+export function getRelatedPosts(currentSlug: string, category: string, limit = 3): PostMeta[] {
+    const allPosts = getAllPosts();
+    return allPosts
+        .filter((post) => post.slug !== currentSlug && post.category === category)
+        .slice(0, limit);
+}
+
+// Extract TOC from markdown content
+export function extractToc(content: string): TocItem[] {
+    const headingRegex = /^(#{2,3})\s+(.+)$/gm;
+    const toc: TocItem[] = [];
+    let match;
+
+    while ((match = headingRegex.exec(content)) !== null) {
+        const level = match[1].length;
+        const text = match[2].trim();
+        const id = text.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+        toc.push({ id, text, level });
+    }
+
+    return toc;
+}
+
+// Format date for display
+export function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+}
+
+// Calculate reading time
+export function calculateReadingTime(content: string): string {
+    const wordsPerMinute = 200;
+    const words = content.split(/\s+/).length;
+    const minutes = Math.ceil(words / wordsPerMinute);
+    return `${minutes} min de lectura`;
+}
