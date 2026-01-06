@@ -130,3 +130,17 @@ body {
 .animate-zoomIn {
   animation: zoomIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Reading Progress Bar - CSS Only */
+@keyframes scale-up {
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reading-progress-bar {
+    animation: scale-up linear;
+    animation-timeline: scroll();
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+}
