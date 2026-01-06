@@ -20,14 +20,6 @@ export default function Home() {
           </div>
 
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-              </span>
-              Disponible para proyectos freelance
-            </div>
-
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
               Hola, soy <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">Torres</span>
             </h1>
@@ -82,7 +74,7 @@ export default function Home() {
                 title={post.title}
                 excerpt={post.excerpt}
                 date={formatDate(post.date)}
-                category={post.category}
+                categories={post.categories}
                 image={post.image}
               />
             ))}

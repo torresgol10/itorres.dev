@@ -8,7 +8,7 @@ export interface PostMeta {
     slug: string;
     title: string;
     date: string;
-    category: string;
+    categories: string[];
     excerpt: string;
     image: string;
     author?: {
@@ -48,12 +48,22 @@ export function getPostBySlug(slug: string): Post | null {
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
 
+    // Handle legacy category vs new categories
+    let categories: string[] = [];
+    if (data.categories && Array.isArray(data.categories)) {
+        categories = data.categories;
+    } else if (data.category) {
+        categories = [data.category];
+    } else {
+        categories = ["General"];
+    }
+
     return {
         slug: realSlug,
         title: data.title || "Untitled",
         date: data.date || new Date().toISOString(),
-        category: data.category || "General",
-        excerpt: data.excerpt || "",
+        categories,
+        excerpt: data.excerpt || data.description || "",
         image: data.image || "",
         author: data.author || {
             name: "Torres",
@@ -82,10 +92,14 @@ export function getAllPosts(): PostMeta[] {
 }
 
 // Get related posts by category
-export function getRelatedPosts(currentSlug: string, category: string, limit = 3): PostMeta[] {
+export function getRelatedPosts(currentSlug: string, categories: string[], limit = 3): PostMeta[] {
     const allPosts = getAllPosts();
     return allPosts
-        .filter((post) => post.slug !== currentSlug && post.category === category)
+        .filter((post) => {
+            if (post.slug === currentSlug) return false;
+            // Check if any category overlaps
+            return post.categories.some(cat => categories.includes(cat));
+        })
         .slice(0, limit);
 }
 

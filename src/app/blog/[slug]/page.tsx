@@ -34,7 +34,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
     const tocItems = extractToc(post.content);
     const readingTime = calculateReadingTime(post.content);
-    const relatedPosts = getRelatedPosts(slug, post.category, 3);
+    const relatedPosts = getRelatedPosts(slug, post.categories, 3);
     const components = useMDXComponents({});
 
     const mdxOptions = {
@@ -81,11 +81,13 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                     <article className="min-w-0 max-w-3xl">
                         {/* Header */}
                         <header className="mb-10">
-                            {/* Category */}
-                            <div className="mb-4">
-                                <span className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">
-                                    {post.category}
-                                </span>
+                            {/* Categories */}
+                            <div className="mb-4 flex flex-wrap gap-2">
+                                {post.categories.map((category) => (
+                                    <span key={category} className="inline-flex items-center rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">
+                                        {category}
+                                    </span>
+                                ))}
                             </div>
 
                             {/* Title */}

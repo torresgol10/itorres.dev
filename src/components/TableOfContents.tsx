@@ -56,7 +56,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
                             <button
                                 onClick={() => handleClick(item.id)}
                                 className={cn(
-                                    "block w-full text-left transition-colors duration-200",
+                                    "block w-full text-left transition-colors duration-200 hover:cursor-pointer",
                                     item.level === 3 && "pl-4",
                                     activeId === item.id
                                         ? "text-foreground font-medium"
@@ -112,7 +112,7 @@ export function MobileTableOfContents({ items }: TableOfContentsProps) {
         <div className="xl:hidden sticky top-16 z-30 border-b border-border bg-white dark:bg-zinc-950">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex w-full items-center justify-between px-6 py-3 text-sm"
+                className="flex w-full items-center justify-between px-6 py-3 text-sm hover:cursor-pointer"
             >
                 <span className="text-muted-foreground">En este artículo</span>
                 <span className="flex items-center gap-2 font-medium">
@@ -129,7 +129,7 @@ export function MobileTableOfContents({ items }: TableOfContentsProps) {
                                 <button
                                     onClick={() => handleClick(item.id)}
                                     className={cn(
-                                        "block w-full text-left py-1.5 text-sm transition-colors",
+                                        "block w-full text-left py-1.5 text-sm transition-colors hover:cursor-pointer",
                                         item.level === 3 && "pl-4",
                                         activeId === item.id
                                             ? "text-primary font-medium"

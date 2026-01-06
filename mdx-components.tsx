@@ -1,9 +1,25 @@
 import type { MDXComponents } from "mdx/types";
 import { CodeBlock } from "@/components/CodeBlock";
 import { ZoomableImage } from "@/components/ZoomableImage";
+import { Table, Thead, Tbody, Tr, Th, Td } from "@/components/Table";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
+        // Table components
+        table: ({ children, ...props }) => <Table {...props}>{children}</Table>,
+        thead: ({ children, ...props }) => <Thead {...props}>{children}</Thead>,
+        tbody: ({ children, ...props }) => <Tbody {...props}>{children}</Tbody>,
+        tr: ({ children, ...props }) => <Tr {...props}>{children}</Tr>,
+        th: ({ children, ...props }) => <Th {...props}>{children}</Th>,
+        td: ({ children, ...props }) => <Td {...props}>{children}</Td>,
+
+        // Map PascalCase for explicit JSX usage in MDX
+        Table: ({ children, ...props }) => <Table {...props}>{children}</Table>,
+        Thead: ({ children, ...props }) => <Thead {...props}>{children}</Thead>,
+        Tbody: ({ children, ...props }) => <Tbody {...props}>{children}</Tbody>,
+        Tr: ({ children, ...props }) => <Tr {...props}>{children}</Tr>,
+        Th: ({ children, ...props }) => <Th {...props}>{children}</Th>,
+        Td: ({ children, ...props }) => <Td {...props}>{children}</Td>,
         // Custom heading components with IDs for TOC
         h1: ({ children, ...props }) => (
             <h1 className="text-3xl font-bold tracking-tight mt-8 mb-4" {...props}>

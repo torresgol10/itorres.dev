@@ -1,0 +1,157 @@
+---
+title: 'Fuentes Sólidas como una Roca: Elimina el CLS y enamora a Google'
+date: '2026-01-04'
+description: 'Aprende a eliminar el Cumulative Layout Shift (CLS) causado por las fuentes web usando métricas de fallback y next/font.'
+tags: ['Performance', 'CSS', 'Next.js', 'Web Vitals']
+author:
+  name: "Torres"
+  role: "Software Developer"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+---
+
+¿Te ha pasado que entras a una web, vas a hacer clic en un botón y, de repente, el texto "salta", el botón se mueve y acabas clickando en un anuncio o en "Cancelar"? 😡
+
+Eso es el **CLS (Cumulative Layout Shift)** provocado por las fuentes.
+
+El navegador carga primero una fuente del sistema (Arial, Times...) y luego la sustituye por tu fuente personalizada (ej. "Inter" o "Montserrat"). Como tienen tamaños diferentes, **todo el layout se descuadra**.
+
+Hoy vamos a solucionar esto de raíz para tener **0 CLS** y una experiencia visual perfecta (UX).
+
+## 🧠 Conceptos Clave: ¿Por qué ocurre?
+
+Para arreglarlo, necesitamos entender dos fenómenos:
+
+* **FOUT (Flash of Unstyled Text):** Se ve la fuente fea (Arial) y luego cambia a la bonita.
+* **Font Matching (El Secreto):** Si logramos que la "fuente fea" ocupe **exactamente el mismo espacio** (alto y ancho) que la "fuente bonita", el usuario verá el cambio de estilo, **pero el texto no se moverá ni un píxel**.
+
+---
+
+## 🛠️ Herramienta Top: Ajuste Perfecto de Fallback
+
+Aquí es donde entra la magia. Calcular manualmente cuánto hay que "estirar" o "encoger" la Arial para que coincida con tu fuente custom es matemático y doloroso.
+
+Para eso he creado esta herramienta:
+
+> **🔗 [zero-cls-font-fallback.vercel.app](https://zero-cls-font-fallback.vercel.app)**
+
+**¿Qué hace exactamente?**
+Esta herramienta analiza tu fuente personalizada y te genera un CSS con propiedades avanzadas (`ascent-override`, `descent-override`, `size-adjust`). Básicamente, **hackea la fuente del sistema** para obligarla a tener las métricas idénticas a tu fuente final.
+
+### Implementación con la herramienta:
+
+1.  Subes tu fuente a la herramienta.
+2.  Copias el CSS generado.
+3.  Lo pegas en tu CSS global.
+
+```css
+/* 1. Tu fuente personalizada */
+@font-face {
+  font-family: 'MiFuenteTop';
+  src: url('/fonts/mi-fuente.woff2') format('woff2');
+  font-display: swap; /* Importante para que no oculte el texto */
+}
+
+/* 2. El Fallback Mágico generado por la herramienta */
+@font-face {
+  font-family: 'MiFuenteTop-Fallback';
+  /* Usamos una fuente local segura */
+  src: local('Arial'); 
+  /* 🪄 AQUÍ ESTÁ LA MAGIA (Valores de ejemplo) */
+  ascent-override: 98.4%;
+  descent-override: 23.1%;
+  line-gap-override: 0%;
+  size-adjust: 102.5%; 
+}
+
+/* 3. Uso en el body */
+body {
+  /* Primero la custom, luego el fallback ajustado */
+  font-family: 'MiFuenteTop', 'MiFuenteTop-Fallback', sans-serif;
+}
+```
+
+✅ **Resultado:** El navegador renderiza `MiFuenteTop-Fallback` inmediatamente. Ocupa el espacio exacto. Cuando `MiFuenteTop` se descarga, el texto cambia de estilo, **pero el layout es inamovible**. Cero saltos.
+
+---
+
+## ⚡ La Alternativa Automática: Next/Font
+
+Si usas Next.js 13+, estás de suerte. El equipo de Vercel integró esta lógica nativamente.
+
+`next/font` descarga la fuente en el *build time*, la aloja contigo (adiós peticiones a Google Fonts) y **calcula automáticamente las métricas de fallback** que vimos arriba sin que tú hagas nada.
+
+```javascript
+import { Inter } from 'next/font/google'
+
+// Next.js inyecta el CSS con size-adjust automáticamente
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+})
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="es" className={inter.className}>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+*Si no usas Next.js, la herramienta `zero-cls-font-fallback` es tu mejor amiga para replicar este comportamiento en cualquier proyecto (Vite, Astro, HTML plano).*
+
+---
+
+## 🔥 Método Hardcore: Preload y Optimización Crítica (Sin Fallback)
+
+¿Odias que se vea la Arial aunque sea por 0.1 segundos? ¿Quieres que tu fuente cargue **antes** que el propio contenido?
+
+Para esto necesitamos priorizar la carga de la fuente al máximo nivel en el `<head>`.
+
+### Estrategia "Critical Font Loading":
+
+1.  **Preload:** Le gritamos al navegador "¡BAJA ESTO YA!".
+2.  **Inlining:** Metemos la declaración `@font-face` directamente en el HTML (no en un archivo .css externo) para evitar la cadena de peticiones.
+
+```html
+<head>
+  <link 
+    rel="preload" 
+    href="/fonts/mi-fuente-bold.woff2" 
+    as="font" 
+    type="font/woff2" 
+    crossorigin 
+  />
+
+  <style>
+    @font-face {
+      font-family: 'MiFuenteTop';
+      src: url('/fonts/mi-fuente-bold.woff2') format('woff2');
+      font-weight: 700;
+      /* "block" oculta el texto hasta 3s esperando la fuente. 
+         Como hacemos preload, debería estar lista casi al instante. */
+      font-display: block; 
+    }
+    
+    body {
+      font-family: 'MiFuenteTop', sans-serif;
+    }
+  </style>
+</head>
+```
+
+**⚠️ Ojo con esto:**
+* Si abusas del `preload` (más de 2 fuentes), ralentizas la carga inicial de la web.
+* Si la fuente tarda en bajar (conexión 3G), el usuario no verá texto (`font-display: block`) durante unos instantes. Es un *trade-off*: eliminas el salto y el cambio de fuente, pero arriesgas tener texto invisible.
+
+---
+
+## ❌ Errores Comunes (Lo que NO debes hacer)
+
+1.  **No usar `woff2`:** Olvida TTF o OTF para web. WOFF2 comprime un 30% más.
+2.  **Google Fonts por CDN:** `<link href="fonts.googleapis...">` añade latencia de conexión DNS. Siempre es mejor alojar las fuentes tú mismo (`next/font` hace esto solo).
+3.  **Icon Fonts:** Usar fuentes para iconos (FontAwesome antiguo) es la receta perfecta para el CLS y parpadeos. Usa SVGs.
+
+## 🏁 Conclusión
+
+Para la mejor experiencia de usuario, combina **Font Fallback Metrics** (con la herramienta **zero-cls-font-fallback**) y `font-display: swap`. Así el usuario lee al instante y la web nunca se rompe. 🚀

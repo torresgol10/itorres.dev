@@ -7,7 +7,7 @@ interface PostCardProps {
     title: string;
     excerpt: string;
     date: string;
-    category: string;
+    categories: string[];
     slug: string;
     image: string;
     className?: string;
@@ -17,7 +17,7 @@ export function PostCard({
     title,
     excerpt,
     date,
-    category,
+    categories,
     slug,
     image,
     className,
@@ -44,10 +44,14 @@ export function PostCard({
             {/* Content */}
             <div className="flex flex-1 flex-col gap-3 p-5">
                 <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center rounded-md bg-secondary/80 px-2 py-0.5 text-xs font-medium text-secondary-foreground ring-1 ring-inset ring-secondary-foreground/10">
-                        {category}
-                    </span>
-                    <time className="text-xs text-muted-foreground">{date}</time>
+                    <div className="flex flex-wrap gap-2">
+                        {categories.map((category) => (
+                            <span key={category} className="inline-flex items-center rounded-md bg-secondary/80 px-2 py-0.5 text-xs font-medium text-secondary-foreground ring-1 ring-inset ring-secondary-foreground/10">
+                                {category}
+                            </span>
+                        ))}
+                    </div>
+                    <time className="text-xs text-muted-foreground whitespace-nowrap ml-2">{date}</time>
                 </div>
 
                 <div className="flex-1 space-y-2">
