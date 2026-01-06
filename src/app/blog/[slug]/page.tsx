@@ -14,6 +14,7 @@ import {
     formatDate,
     calculateReadingTime
 } from "@/lib/posts";
+import { ReadingProgress } from "@/components/ReadingProgress";
 import { rehypeExtractCode } from "@/lib/rehype-plugins";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
@@ -60,6 +61,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
     return (
         <div className="min-h-screen bg-background antialiased">
+            <ReadingProgress />
             <Header />
 
             {/* Mobile TOC - sticky below header */}

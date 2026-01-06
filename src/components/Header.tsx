@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface HeaderProps {
     tocItems?: { id: string; text: string; level: number }[];
@@ -49,6 +50,7 @@ export function Header({ tocItems }: HeaderProps) {
                         >
                             Proyectos
                         </Link>
+                        <ThemeToggle />
                     </nav>
 
                     <button

@@ -143,19 +143,31 @@ export default {
 
 ¿Quieres priorizar una fuente crítica (ej. el título principal) a toda costa?
 
-El `preload` obliga al navegador a descargar la fuente antes que el CSS o el JS.
+El `preload` obliga al navegador a descargar la fuente **antes** de que empiece a leer el CSS. Pero cuidado: **solo la descarga**. Aún necesitas definirla para usarla.
 
-**⚠️ Advertencia:** Úsalo con cuidado. Si la fuente tarda en bajar, el usuario verá un espacio en blanco (FOIT) hasta que llegue. Solo para la fuente más importante *above the fold*.
+**⚠️ Advertencia:** Úsalo con cuidado. Si abusas, bloquearás la carga del resto de la web.
 
 ```html
 <head>
   <link 
     rel="preload" 
-    href="/fonts/mi-fuente-bold.woff2" 
+    href="/fonts/mi-fuente.woff2" 
     as="font" 
     type="font/woff2" 
     crossorigin 
   />
+
+  <style>
+    @font-face {
+      font-family: 'MiFuenteTop';
+      src: url('/fonts/mi-fuente.woff2') format('woff2');
+      font-display: swap;
+    }
+
+    h1 {
+      font-family: 'MiFuenteTop', sans-serif;
+    }
+  </style>
 </head>
 ```
 
