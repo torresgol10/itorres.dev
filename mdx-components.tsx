@@ -1,5 +1,6 @@
 import type { MDXComponents } from "mdx/types";
 import { CodeBlock } from "@/components/CodeBlock";
+import { ZoomableImage } from "@/components/ZoomableImage";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
@@ -96,6 +97,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         em: ({ children }) => <em className="italic">{children}</em>,
         // Horizontal rule
         hr: () => <hr className="my-8 border-border" />,
+        // Images
+        img: (props) => (
+            <ZoomableImage
+                {...(props as any)}
+                alt={props.alt || ""}
+            />
+        ),
         ...components,
     };
 }
