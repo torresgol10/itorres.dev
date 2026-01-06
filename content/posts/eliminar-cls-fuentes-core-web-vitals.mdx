@@ -1,0 +1,181 @@
+---
+title: 'Elimina el CLS en Fuentes Web: Guía Definitiva para Mejorar tus Core Web Vitals'
+description: 'Aprende a eliminar los saltos de diseño (CLS) causados por las fuentes, optimizando el rendimiento y mejorando tus Core Web Vitals con métricas de fallback, next/font y automatización.'
+date: '2026-01-06'
+image: "/eliminar-cls-fuentes-core-web-vitals.png"
+categories: ['Performance', 'CSS', 'Next.js', 'Core Web Vitals', 'SEO']
+
+author:
+  name: "Iván Torres"
+  role: "Software Developer"
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+---
+
+# Elimina el CLS en Fuentes Web: Guía Definitiva para Mejorar tus Core Web Vitals
+
+¿Te ha pasado que entras a una web, vas a hacer clic en un botón y, de repente, el texto "salta", el botón se mueve y acabas clickando en un anuncio o en "Cancelar"? 😡
+
+Eso es el **CLS (Cumulative Layout Shift)**.
+
+No es solo molesto: **Google te penaliza por ello**. El CLS es uno de los tres pilares de los **Core Web Vitals**. Un puntaje alto no solo frustra a tus usuarios, sino que **hunde tu posicionamiento SEO**.
+
+El culpable suele ser la fuente. El navegador carga primero una fuente del sistema (Arial, Times...) y luego la sustituye por tu fuente personalizada. Como tienen tamaños distintos, **todo el layout explota**.
+
+
+
+Hoy vamos a arreglar esto para siempre.
+
+---
+
+## 🧠 Conceptos Clave: Font Matching
+
+Para evitar el salto, no necesitamos magia, necesitamos **Matemáticas CSS**.
+
+El secreto es el **Font Matching**: Modificar las dimensiones de la "fuente fea" (Arial) para que ocupe **exactamente el mismo espacio físico** que la "fuente bonita" (Inter).
+
+Para ello, usamos tres propiedades CSS modernas que "hackean" la fuente del sistema:
+
+* **`ascent-override`**: Ajusta la altura de la línea por encima del texto (el "techo").
+* **`descent-override`**: Ajusta la profundidad por debajo de la línea base (el "suelo").
+* **`size-adjust`**: Escala el tamaño general de la letra para que coincida en ancho.
+
+> ℹ️ **Nota de Compatibilidad:** Estas propiedades son parte del estándar "Baseline". En 2026, son soportadas por el 100% de los navegadores modernos. Úsalas sin miedo.
+
+
+
+---
+
+## 🛠️ Opción 1: Ajuste Manual (CSS Puro)
+
+Si no usas frameworks, hacerlo a mano es doloroso. Por eso, **he creado esta herramienta gratuita** que calcula estos valores matemáticos por ti.
+
+> **🔗 Mi Herramienta:** [zero-cls-font-fallback.vercel.app](https://zero-cls-font-fallback.vercel.app)
+
+1.  Sube tu fuente (**Importante:** Usa siempre formato `.woff2` por su compresión superior).
+2.  Copia el CSS generado.
+3.  Pégalo en tu CSS global.
+
+```css
+/* 1. Tu fuente personalizada (carga lenta) */
+@font-face {
+  font-family: 'MiFuenteTop';
+  src: url('/fonts/mi-fuente.woff2') format('woff2');
+  font-display: swap; 
+}
+
+/* 2. El Fallback Mágico (carga instantánea) */
+@font-face {
+  font-family: 'MiFuenteTop-Fallback';
+  /* Usamos una fuente local segura */
+  src: local('Arial'); 
+  /* 🪄 AQUÍ ESTÁ LA MAGIA (Valores generados por mi tool) */
+  ascent-override: 98.4%;
+  descent-override: 23.1%;
+  line-gap-override: 0%;
+  size-adjust: 102.5%; 
+}
+
+/* 3. Uso en el body */
+body {
+  /* Primero la custom, luego el fallback ajustado */
+  font-family: 'MiFuenteTop', 'MiFuenteTop-Fallback', sans-serif;
+}
+```
+
+---
+
+## ⚡ Opción 2: La Vía Automática (Next.js & Vite)
+
+En 2026, automatizamos cosas. Deja que las herramientas calculen esto en el *build time*.
+
+### En Next.js (13+)
+El componente `next/font` ya hace esto nativamente. Inyecta los valores de *override* automáticamente sin configuración extra.
+
+```bash
+# No necesitas instalar nada extra, viene con Next.js
+```
+
+```javascript
+import { Inter } from 'next/font/google'
+
+// Next.js genera el fallback métrico automáticamente
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  adjustFontFallback: true // ✅ Activado por defecto
+})
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="es" className={inter.className}>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+### En Vite / Nuxt / Astro
+Para el resto del ecosistema, existe **`unplugin-fontaine`**.
+Este plugin lee tus archivos CSS al compilar, detecta las fuentes y genera los fallbacks métricos automáticamente. Es "instalar y olvidar".
+
+```bash
+npm install -D unplugin-fontaine
+```
+
+```javascript
+// vite.config.js
+import { FontaineTransform } from 'unplugin-fontaine/vite'
+
+export default {
+  plugins: [
+    FontaineTransform({
+      // Mapea tus fuentes a un fallback seguro del sistema
+      fallbacks: ['BlinkMacSystemFont', 'Segoe UI', 'Helvetica Neue', 'Arial'], 
+      resolvePath: (id) => new URL(`.${id}`, import.meta.url),
+    })
+  ]
+}
+```
+
+---
+
+## 🔥 Opción 3: Preload (Método Hardcore)
+
+¿Quieres priorizar una fuente crítica (ej. el título principal) a toda costa?
+
+El `preload` obliga al navegador a descargar la fuente antes que el CSS o el JS.
+
+**⚠️ Advertencia:** Úsalo con cuidado. Si la fuente tarda en bajar, el usuario verá un espacio en blanco (FOIT) hasta que llegue. Solo para la fuente más importante *above the fold*.
+
+```html
+<head>
+  <link 
+    rel="preload" 
+    href="/fonts/mi-fuente-bold.woff2" 
+    as="font" 
+    type="font/woff2" 
+    crossorigin 
+  />
+</head>
+```
+
+---
+
+## ❌ Errores Comunes que matan tu Performance
+
+1.  **Icon Fonts (FontAwesome antiguo):** Mala práctica en 2026. Causan saltos y son pesadas. **Usa siempre SVG**: son vectoriales, ligeros y no bloquean el renderizado.
+2.  **Demasiados archivos de fuente:** No cargues 5 archivos (`light`, `regular`, `bold`, `black`...). Usa una sola **Variable Font** que contenga todos los pesos en un solo archivo optimizado.
+3.  **Google Fonts por CDN:** `<link href="fonts.googleapis...">` añade latencia DNS. Siempre aloja las fuentes tú mismo (Self-hosting) o usa `next/font`.
+
+---
+
+## 🏁 Conclusión: Mide tu Éxito
+
+Implementar Font Matching es la diferencia entre una web que se siente "rota" al cargar y una que se siente sólida como una roca.
+
+**¿Tu siguiente paso?**
+1.  Implementa una de estas soluciones hoy.
+2.  Abre **Lighthouse** o la extensión **Web Vitals**.
+3.  Observa cómo tu métrica de CLS baja a **0**.
+
+¡Tu SEO y tus usuarios te lo agradecerán! 🚀

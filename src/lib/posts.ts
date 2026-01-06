@@ -11,6 +11,7 @@ export interface PostMeta {
     categories: string[];
     excerpt: string;
     image: string;
+    imageAlt: string;
     author?: {
         name: string;
         role: string;
@@ -48,10 +49,12 @@ export function getPostBySlug(slug: string): Post | null {
     const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
 
-    // Handle legacy category vs new categories
+    // Handle legacy category vs new categories vs tags
     let categories: string[] = [];
     if (data.categories && Array.isArray(data.categories)) {
         categories = data.categories;
+    } else if (data.tags && Array.isArray(data.tags)) {
+        categories = data.tags; // Fallback: use tags as categories
     } else if (data.category) {
         categories = [data.category];
     } else {
@@ -65,6 +68,7 @@ export function getPostBySlug(slug: string): Post | null {
         categories,
         excerpt: data.excerpt || data.description || "",
         image: data.image || "",
+        imageAlt: data.imageAlt || data.title || "Blog post image",
         author: data.author || {
             name: "Torres",
             role: "Software Developer",
