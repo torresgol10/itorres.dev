@@ -36,7 +36,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     const tocItems = extractToc(post.content);
     const readingTime = calculateReadingTime(post.content);
     const relatedPosts = getRelatedPosts(slug, post.categories, 3);
-    const components = useMDXComponents({});
+    const components = useMDXComponents({ h1: () => null });
 
     const mdxOptions = {
         rehypePlugins: [
@@ -102,13 +102,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                                 {/* Author */}
                                 {post.author && (
                                     <div className="flex items-center gap-3">
-                                        <Image
-                                            src={post.author.avatar}
-                                            alt={post.author.name}
-                                            width={44}
-                                            height={44}
-                                            className="rounded-full ring-2 ring-border"
-                                        />
                                         <div>
                                             <p className="font-medium text-foreground">{post.author.name}</p>
                                             <p className="text-sm text-muted-foreground">{post.author.role}</p>
