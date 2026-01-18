@@ -13,15 +13,51 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Iván Torres | Software Developer",
-  description: "Software developer passionate about modern web apps, sharing learning and experiments with code.",
+  title: {
+    default: "Iván Torres | Software Developer",
+    template: "%s | Iván Torres",
+  },
+  description: "Desarrollador de software apasionado por las aplicaciones web modernas, compartiendo aprendizajes y experimentos con código.",
+  keywords: ["Software Developer", "Web Development", "React", "Next.js", "TypeScript", "JavaScript", "Programming Blog", "Iván Torres"],
+  authors: [{ name: "Iván Torres", url: "https://itorres.dev" }],
+  creator: "Iván Torres",
+  metadataBase: new URL("https://itorres.dev"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "Iván Torres | Software Developer",
-    description: "Software developer passionate about modern web apps, sharing learning and experiments with code.",
+    description: "Desarrollador de software apasionado por las aplicaciones web modernas, compartiendo aprendizajes y experimentos con código.",
     url: "https://itorres.dev",
     siteName: "Iván Torres",
     locale: "es_ES",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png", // We should ensure this image exists or use a default one
+        width: 1200,
+        height: 630,
+        alt: "Iván Torres | Software Developer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Iván Torres | Software Developer",
+    description: "Desarrollador de software apasionado por las aplicaciones web modernas, compartiendo aprendizajes y experimentos con código.",
+    creator: "@itorres_dev", // Assuming this is the handle, or we can leave it generic
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
@@ -36,7 +72,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50`}
       >

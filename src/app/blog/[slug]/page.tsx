@@ -1,4 +1,5 @@
 
+import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { TableOfContents, MobileTableOfContents } from "@/components/TableOfContents";
 import { PostCard } from "@/components/PostCard";
@@ -23,6 +24,51 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { useMDXComponents } from "../../../../mdx-components";
 
 // ...
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params;
+    const post = getPostBySlug(slug);
+
+    if (!post) {
+        return {
+            title: 'Post no encontrado',
+            description: 'El artículo que buscas no existe.'
+        };
+    }
+
+    const ogImage = `/blog/${slug}/opengraph-image`; // Assuming we might have dynamic OG generation or generic
+
+    return {
+        title: post.title,
+        description: post.excerpt,
+        authors: [{ name: post.author?.name || 'Iván Torres' }],
+        alternates: {
+            canonical: `/blog/${slug}`,
+        },
+        openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            type: 'article',
+            publishedTime: post.date,
+            authors: [post.author?.name || 'Iván Torres'],
+            images: [
+                {
+                    url: ogImage,
+                    width: 1200,
+                    height: 630,
+                    alt: post.title,
+                }
+            ],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            description: post.excerpt,
+            images: [ogImage],
+        }
+    };
+}
+
 
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
