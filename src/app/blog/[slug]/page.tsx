@@ -133,18 +133,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                             </div>
                         </header>
 
-                        {/* Featured Image */}
-                        {post.image && (
-                            <div className="relative mb-10 aspect-video overflow-hidden rounded-xl border border-border">
-                                <Image
-                                    src={post.image}
-                                    alt={post.title}
-                                    fill
-                                    className="object-cover"
-                                    priority
-                                />
-                            </div>
-                        )}
+
 
                         {/* MDX Content */}
                         <div className="prose-custom">
@@ -170,7 +159,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                         </h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {relatedPosts.map((relatedPost) => (
-                                <PostCard key={relatedPost.slug} {...relatedPost} />
+                                <PostCard
+                                    key={relatedPost.slug}
+                                    title={relatedPost.title}
+                                    slug={relatedPost.slug}
+                                    excerpt={relatedPost.excerpt}
+                                    date={formatDate(relatedPost.date)}
+                                    categories={relatedPost.categories}
+                                />
                             ))}
                         </div>
                     </section>

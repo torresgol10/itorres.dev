@@ -32,6 +32,7 @@ export default function Home() {
               <Link
                 href="https://github.com/torresgol10"
                 target="_blank"
+                aria-label="GitHub"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
               >
                 <svg
@@ -52,6 +53,7 @@ export default function Home() {
               <Link
                 href="https://linkedin.com"
                 target="_blank"
+                aria-label="LinkedIn"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
               >
                 <svg
@@ -94,7 +96,6 @@ export default function Home() {
                 excerpt={post.excerpt}
                 date={formatDate(post.date)}
                 categories={post.categories}
-                image={post.image}
               />
             ))}
           </div>
