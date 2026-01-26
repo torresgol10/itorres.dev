@@ -1,0 +1,65 @@
+# MDX: Deja de escribir texto, empieza a programar contenido 🚀
+
+Markdown se te ha quedado pequeño. Es la verdad. Para un README básico está bien, pero si estás construyendo documentación técnica, un blog de ingeniería o un sistema de diseño, el HTML estático es una cárcel. **Es hora de que tu contenido sea software.** 🔥
+
+**MDX** no es solo "Markdown con superpoderes"; es un cambio de paradigma donde tus archivos `.mdx` se compilan como componentes de React (o Vue/Svelte). Ya no pegas capturas de pantalla; insertas el componente real. ⚛️
+
+---
+
+### El salto: De estático a interactivo
+
+En el flujo tradicional, el Markdown es texto muerto. En MDX, tienes acceso total al ecosistema de tu framework. ¿Quieres un playground interactivo en medio de un post? Solo impórtalo.
+
+```mdx
+import { LiveCode } from '@/components/Editor'
+import { FeatureChart } from '@/components/Charts'
+
+# Optimizando el Event Loop ⚡️
+
+Antes de profundizar, mira cómo se comporta la cola de tareas en tiempo real:
+
+<LiveCode snippet="setTimeout(() => console.log('Macro'), 0)" />
+
+<FeatureChart data={performanceData} />
+```
+
+### Matiz Senior: El Runtime importa (y mucho) 🧠
+
+Aquí es donde muchos juniors se pierden. No es lo mismo renderizar MDX en tiempo de compilación que en tiempo de ejecución.
+
+1.  **`next-mdx-remote`:** Es el estándar actual para **React Server Components (RSC)**. No necesita bundlers pesados en el cliente y es ideal si traes el contenido desde un CMS o base de datos. Mantiene el JS al mínimo. 📉
+2.  **`mdx-bundler`:** Si necesitas resolver imports complejos de otros archivos dentro de tus propios archivos MDX, esta es tu herramienta. Es más pesado pero más flexible.
+3.  **Seguridad:** MDX ejecuta código. **Nunca** renderices MDX que provenga de inputs de usuarios no confiables sin un proceso de sanitización riguroso.
+
+### Component Mapping: El "Hack" de Productividad
+
+No pierdas tiempo añadiendo clases de Tailwind a cada párrafo. Usa el `provider` para mapear elementos estándar a tus componentes de diseño:
+
+```tsx
+// components/mdx-layout.tsx
+const components = {
+  h1: (props) => <h1 className="text-4xl font-extrabold tracking-tight" {...props} />,
+  a: (props) => <CustomLink className="text-primary underline" {...props} />,
+  pre: CodeSnippet, // Syntax highlighting con Shiki o Prism
+}
+
+export function MDXRemoteWrapper({ source }) {
+  return <MDXRemote {...source} components={components} />
+}
+```
+
+### MDX en la era de los Server Components (Next.js 14/15) 🏗️
+
+Hoy, la mejor forma de usar MDX es aprovechando **RSC**. Al usar el paquete `@next/mdx`, el contenido se procesa en el servidor. 
+
+**Resultado:** El usuario recibe HTML puro para el texto y solo descarga el JavaScript necesario para los componentes interactivos que hayas incluido. **Zero-bundle-size por defecto.** ⚡️
+
+### Buenas Prácticas vs. Errores de Novato
+
+*   **❌ Error:** Definir lógica de negocio pesada o `useEffects` gigantes dentro del archivo `.mdx`.
+*   **✅ Práctica:** Mantén el MDX limpio. Si la lógica supera las 5 líneas, muévela a un componente externo y úsalo como una "caja negra".
+*   **✅ Práctica:** Usa **Metadata (Frontmatter)** para el SEO y la gestión de fechas, pero tipado con herramientas como `contentlayer` o `velite` para evitar errores en tiempo de ejecución.
+
+### Conclusión
+
+Markdown te dio la estructura; MDX te da el control total de la UI. Si tu documentación no permite al usuario interactuar con el código, estás enviando a tus desarrolladores de vuelta a los años 90. **Programa tu contenido.** 🚀

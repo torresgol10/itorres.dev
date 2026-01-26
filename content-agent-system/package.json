@@ -1,0 +1,34 @@
+{
+  "name": "content-agent-system",
+  "version": "1.0.0",
+  "description": "Reliable multi-agent system for high-quality content generation",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "langgraph",
+    "content-generation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/core": "1.1.17",
+    "@langchain/google-genai": "^2.1.13",
+    "@langchain/langgraph": "^0.2.41",
+    "axios": "^1.13.3",
+    "cheerio": "^1.2.0",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/node": "^22.10.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
