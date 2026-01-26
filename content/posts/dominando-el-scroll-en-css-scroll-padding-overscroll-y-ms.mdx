@@ -1,0 +1,92 @@
+---
+title: 'Dominando el Scroll en CSS: scroll-padding, overscroll y más'
+excerpt: 'Aprende a gestionar el comportamiento del desplazamiento nativo y soluciona el error del contenido oculto tras un header fijo con CSS moderno.'
+categories: ['CSS', 'UX', 'Design']
+date: '2026-01-26'
+
+author:
+  name: "Iván Torres"
+  role: "Software Developer"
+---
+
+El desplazamiento (scroll) es la interacción más fundamental de la web. Históricamente, controlar cómo se comporta el scroll requieria JavaScript o hacks complejos. Hoy, gracias a las especificaciones modernas de CSS, tenemos un control granular sobre la experiencia de desplazamiento directamente en nuestras hojas de estilo.
+
+Basándonos en los fundamentos de [CSS Overflow](https://web.dev/learn/css/overflow), exploraremos cómo mejorar la UX y solucionar uno de los problemas más comunes en el diseño de interfaces: la colisión entre anclas y menús fijos.
+
+## Más allá de `overflow: auto`
+
+La propiedad `overflow` es estándar, pero las propiedades de la familia `scroll-*` y `overscroll-*` son las que aportan el pulido visual que antes exigía librerías pesadas.
+
+### Evitando el "Scroll Chaining"
+Un patrón de UX frustrante ocurre en modales o barras laterales (`sidebars`). Cuando el usuario llega al final del scroll del modal y sigue desplazando, el navegador comienza a mover el `body` de la página detrás. Esto se conoce como **Scroll Chaining**.
+
+Para evitarlo, usamos `overscroll-behavior`.
+
+```css
+.sidebar {
+  overflow-y: auto;
+  /* Evita que el scroll se propague al padre (body) */
+  overscroll-behavior: contain; 
+}
+```
+Esto le indica al navegador que el límite de desplazamiento de este componente es "firme" y no debe pasar la interacción al contenedor padre.
+
+## El Problema: Header Fijo vs. Enlaces Ancla
+
+Este es un escenario clásico:
+1. Tienes un menú de navegación con `position: fixed` o `sticky` en la parte superior (ej. `80px` de alto).
+2. Tienes un enlace interno (ancla) como `<a href="#seccion-2">`.
+3. Al hacer clic, el navegador lleva el elemento `#seccion-2` al borde superior de la ventana (`top: 0`).
+
+**Resultado:** El título de tu sección queda oculto *detrás* de tu menú fijo.
+
+### La Solución: `scroll-padding`
+
+Antiguamente, solucionábamos esto añadiendo márgenes negativos invisibles a los encabezados o usando JavaScript para interceptar el clic y calcular el offset. Ya no es necesario.
+
+La propiedad `scroll-padding` permite definir un "colchón" o espacio de seguridad en el contenedor de desplazamiento (generalmente el `html`) que el navegador respetará al calcular la posición de un ancla.
+
+```css
+html {
+  /* 1. Definimos el desplazamiento suave nativo */
+  scroll-behavior: smooth;
+
+  /* 2. Reservamos espacio arriba igual (o mayor) a la altura del header */
+  /* Si tu header mide 80px, usa un valor ligeramente mayor */
+  scroll-padding-top: 100px; 
+}
+```
+
+Con estas líneas, cualquier navegación por anclas (`#id`) se detendrá 100 píxeles antes del borde superior del viewport, asegurando que el contenido sea visible debajo de tu menú fijo.
+
+### Alternativa: `scroll-margin`
+
+Si no puedes aplicar esto globalmente en el `html` (por ejemplo, si el contenedor de scroll es un `div` específico o si tienes headers de altura variable en diferentes páginas), puedes usar `scroll-margin` en el elemento destino.
+
+```css
+h2 {
+  /* El navegador dejará este margen virtual al hacer scroll hacia este elemento */
+  scroll-margin-top: 100px;
+}
+```
+A diferencia de `margin-top`, `scroll-margin-top` **no afecta al diseño visual** del documento; solo afecta a la posición de parada del scroll.
+
+## Consideraciones de Accesibilidad
+
+Aunque `scroll-behavior: smooth` mejora la estética, puede causar mareos o malestar a usuarios con trastornos vestibulares. Como desarrolladores responsables, siempre debemos respetar la preferencia del usuario sobre el movimiento.
+
+Envuelve tu comportamiento de scroll suave en una media query:
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+```
+
+## Conclusión
+
+El CSS moderno nos permite eliminar deuda técnica de JavaScript para tareas puramente visuales. El uso de `scroll-padding` para gestionar menús fijos y `overscroll-behavior` para contenedores modales son prácticas esenciales para una web robusta y pulida.
+
+Implementar estas propiedades hoy mejora la mantenibilidad de tu código y la experiencia final de tus usuarios.

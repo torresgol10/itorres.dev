@@ -4,7 +4,7 @@ import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { AgentState } from "../state";
 
 export const reflectorNode = async (state: typeof AgentState.State) => {
-  const model = new ChatGoogleGenerativeAI({ model: "gemini-3-flash-preview", temperature: 0 });
+  const model = new ChatGoogleGenerativeAI({ model: "gemini-3-pro-preview", temperature: 0 });
 
   console.log("--- Reflector Agent (Gemini): Critiquing ---");
 

@@ -52,7 +52,17 @@ const workflow = new StateGraph(AgentState)
     .addNode("writer", writerNode)
     .addNode("reflector", reflectorNode)
 
-    .addEdge(START, "researcher")
+    // START deciding where to go: if there's a draft, go to reflector
+    .addConditionalEdges(START, (state) => {
+        if (state.draft) {
+            console.log("--- Starting in REVIEW MODE (Existing Draft) ---");
+            return "reflector";
+        }
+        return "researcher";
+    }, {
+        researcher: "researcher",
+        reflector: "reflector"
+    })
 
     // Researcher decision: Tool vs Writer
     .addConditionalEdges("researcher", shouldResearchContinue, {
@@ -79,13 +89,32 @@ async function main() {
     // Check if input contains url roughly
     const hasUrl = input.includes("http");
 
-    console.log(`Starting generation request: "${input}" [Style: ${style}]\n`);
+    console.log(`Starting request: "${input}" [Style: ${style}]\n`);
+
+    let initialDraft = "";
+    let effectiveTopic = input;
+
+    // Simple check: if input is a local file that exists, read it
+    if (input.endsWith(".md") || input.endsWith(".mdx")) {
+        try {
+            initialDraft = await fs.readFile(input, "utf-8");
+            console.log(`--- Detected file input. Reviewing ${input} ---`);
+            effectiveTopic = `Reviewing existing post: ${input}`;
+        } catch (e) {
+            // Not a file or can't read, treat as topic
+        }
+    }
 
     // We construct the first message based on the CLI input
     const initialInputs = {
-        // We pass the user input as a message to kickoff the chat history
-        messages: [{ role: "user", content: `Please research and write a post about: ${input}. ${hasUrl ? "Use the tool to read the link." : ""}` }],
-        topic: input,
+        messages: [{
+            role: "user",
+            content: initialDraft
+                ? `Please review this existing post: ${input}`
+                : `Please research and write a post about: ${input}. ${hasUrl ? "Use the tool to read the link." : ""}`
+        }],
+        topic: effectiveTopic,
+        draft: initialDraft,
         writerStyle: style,
     } as any;
 
@@ -109,6 +138,10 @@ async function main() {
     }
 
     if (finalDraft) {
+        // Improved regex to capture content after 'title:' even without quotes
+        const titleMatch = finalDraft.match(/title:\s*(?:['"]([^'"]*)['"]|([^\n\r]*))/);
+        const extractedTitle = (titleMatch ? (titleMatch[1] || titleMatch[2]) : input).trim();
+
         const slugify = (text: string) => text.toLowerCase()
             .replace(/\s+/g, '-')
             .replace(/[^\w\-]+/g, '')
@@ -116,7 +149,7 @@ async function main() {
             .replace(/^-+/, '')
             .replace(/-+$/, '');
 
-        const outputPath = `${slugify(input)}.mdx`;
+        const outputPath = `${slugify(extractedTitle)}.mdx`;
         await fs.writeFile(outputPath, finalDraft);
         console.log(`\n--- Result saved to ${outputPath} ---`);
     }

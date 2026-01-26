@@ -5,11 +5,13 @@ import { AgentState } from "../state";
 import { styles, WriterStyle } from "../prompts/styles";
 
 export const writerNode = async (state: typeof AgentState.State) => {
-    const model = new ChatGoogleGenerativeAI({ model: "gemini-3-flash-preview", temperature: 0.7 });
+    const model = new ChatGoogleGenerativeAI({ model: "gemini-3-pro-preview", temperature: 0.7 });
 
-    const isRevision = state.revisionCount > 0;
+    const isRevision = state.revisionCount > 0 || !!state.critique;
     const styleKey = (state.writerStyle as WriterStyle) || "web-dev";
     const selectedStylePrompt = styles[styleKey] || styles["web-dev"];
+
+    const today = new Date().toISOString().split('T')[0];
 
     console.log(isRevision
         ? `--- Writer Agent (Gemini): Revising (Iteration ${state.revisionCount}) [Style: ${styleKey}] ---`
@@ -17,23 +19,33 @@ export const writerNode = async (state: typeof AgentState.State) => {
 
     // --- SYSTEM PROMPT DEFINITION ---
     const systemPrompt = `${selectedStylePrompt}
-Eres un **Senior Technical Writer y Divulgador de Software** (estilo "Midudev" o "rauchg").
-Tu misión es transformar ideas o documentación técnica en posts altamente efectivos, legibles y prácticos.
-Audiencia: Desarrolladores (Juniors a Seniors) que valoran su tiempo.
 
-### DINÁMICA DE MODOS (SELECTOR AUTOMÁTICO)
-Analiza el input y elige:
-1. **MODO MICRO (Default):** Tips rápidos, snippets. (200-300 palabras). Estructura: Título, Gancho, Solución (API), Código, Matiz Senior.
-2. **MODO DEEP:** Si piden "guía", "tutorial", "profundidad". (500-800 palabras). Estructura: Título (Promesa), Contexto Real, Conceptos Clave, Implementación Paso a Paso, Buenas Prácticas vs Errores, Conclusión.
+### MANDATORY: FRONTMATTER (METADATA)
+Every post MUST begin EXACTLY with this metadata block (Frontmatter) in YAML format:
+---
+title: '[Impactful Title]'
+excerpt: '[Compelling 1-2 sentence summary]'
+categories: ['[Category1]', '[Category2]']
+date: '${today}'
 
-### REGLAS DE ESTILO (NO NEGOCIABLES)
-- **Cero Relleno:** Elimina saludos ("Hola a todos"), intros obvias o conclusiones vacías. AL GRANO.
-- **Tono:** Cercano, técnico, moderno, entusiasta.
-- **Código:** Especifica lenguaje. Usa ES6+, HTML semántico, CSS moderno.
-- **Filosofía:** Cómo se usa HOY en producción. Nada de historia irrelevante.
+author:
+  name: "Iván Torres"
+  role: "Software Developer"
+---
 
-### FUENTES
-Usa esta información investigada (si aplica) pero NO menciones "he buscado en internet":
+### MODE DYNAMICS (AUTO-SELECTOR)
+Analyze the input and choose:
+1. **MICRO MODE (Default):** Quick tips, snippets. (200-300 words). Structure: Title, Hook, Solution (API), Code, Senior Nuance.
+2. **DEEP MODE:** If "guide", "tutorial", "depth" is requested. (500-800 words). Structure: Title (Promise), Real Context, Key Concepts, Step-by-Step Implementation, Best Practices vs Errors, Conclusion.
+
+### STYLE RULES (CRITICAL)
+- **Zero Fluff:** Remove greetings ("Hello everyone"), obvious intros, or empty conclusions. STRAIGHT TO THE POINT.
+- **Tone:** Technical, modern, enthusiastic.
+- **Code:** Specify language. Use ES6+, semantic HTML, modern CSS.
+- **Philosophy:** How it is used TODAY in production. No irrelevant history.
+
+### SOURCES
+Use this researched information (if applicable) but DO NOT mention "I searched on the internet":
 ${state.researchData}
 `;
 

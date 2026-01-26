@@ -6,7 +6,7 @@ import { scrapeUrlTool } from "../tools/scrape";
 
 export const researcherNode = async (state: typeof AgentState.State) => {
   const model = new ChatGoogleGenerativeAI({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3-pro-preview",
     temperature: 0
   }).bindTools([scrapeUrlTool]);
 
