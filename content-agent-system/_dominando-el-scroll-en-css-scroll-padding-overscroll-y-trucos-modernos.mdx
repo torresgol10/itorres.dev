@@ -1,0 +1,110 @@
+---
+title: 'Dominando el Scroll en CSS: scroll-padding, overscroll y trucos modernos'
+excerpt: 'Deja de usar JavaScript para arreglar el scroll. Aprende a usar scroll-padding, overscroll-behavior y scrollbar-gutter para una UX nativa perfecta.'
+categories: ['CSS', 'UX', 'Web Performance']
+date: '2026-01-28'
+
+author:
+  name: "Iván Torres"
+  role: "Software Developer"
+---
+
+Encabezados fijos que tapan el contenido al hacer clic en un ancla, modales que arrastran el scroll del `body` y saltos de diseño repentinos. Seamos honestos: gestionar el scroll en la web solía ser una pesadilla de hacks en CSS y listeners costosos en JavaScript.
+
+La buena noticia es que el estándar ha evolucionado. Ya no necesitas librerías externas ni matemáticas complejas para lograr una experiencia fluida.
+
+Aquí tienes las 5 propiedades modernas de CSS para eliminar la deuda técnica de tu scroll hoy mismo.
+
+## 1. El problema del Header Fijo: `scroll-padding` 🤕
+
+Si usas `position: sticky` o `fixed` en tu navegación, conoces el dolor: haces clic en un enlace interno (`#seccion`) y el título queda decapitado bajo el header.
+
+❌ **Antes:** Hacks sucios con márgenes negativos (`margin-top: -80px; padding-top: 80px;`) en cada sección.
+✅ **Ahora:** Una sola línea en el contenedor global.
+
+**`scroll-padding`** crea un "colchón" de seguridad en la parte superior del viewport, obligando al navegador a detener el scroll antes de tocar el borde.
+
+```css
+html {
+  /* Reserva espacio para un header de 80px + 20px de aire */
+  scroll-padding-top: 100px;
+  
+  /* Bonus: suaviza la navegación */
+  scroll-behavior: smooth;
+}
+```
+
+## 2. Control Granular: `scroll-margin` 🎯
+
+A veces no quieres afectar a todo el sitio, sino dar "aire" a un elemento específico cuando se navega hacia él. Aquí entra **`scroll-margin`**.
+
+Es perfecto para tarjetas destacadas o secciones de comentarios que necesitan un respiro visual al recibir el foco.
+
+```css
+.card-destacada {
+  /* El navegador frenará 2rem ANTES de tocar este elemento */
+  scroll-margin-top: 2rem;
+}
+```
+
+## 3. Atrapando el Scroll: `overscroll-behavior` ⛓️
+
+El "Scroll Chaining" es un error de UX crítico. Tienes un modal o sidebar con scroll; llegas al final del contenido, sigues deslizando y... **¡empieza a moverse la página de fondo!** Esto rompe la inmersión y frustra al usuario.
+
+❌ **Antes:** Listeners de JS para bloquear el scroll del `body` y calcular anchos de barra para evitar saltos.
+✅ **Ahora:** `overscroll-behavior`.
+
+```css
+.modal-body {
+  overflow-y: auto;
+  
+  /* 'contain' atrapa el scroll dentro del componente */
+  overscroll-behavior: contain;
+}
+```
+
+*   **`contain`**: Evita que el scroll se propague al padre (el body).
+*   **`none`**: Evita la propagación Y elimina el efecto de rebote (útil para mapas o canvas).
+
+## 4. Estabilidad Visual: `scrollbar-gutter` ⚖️
+
+¿Tu diseño "baila" hacia la izquierda cuando pasas de una página corta a una larga? Eso es el ancho de la barra de desplazamiento (aprox. 15px-17px) empujando tu contenido. Esto genera un **Cumulative Layout Shift (CLS)** innecesario.
+
+Olvídate de `overflow-y: scroll` forzado.
+
+```css
+html {
+  /* Reserva el espacio de la barra SIEMPRE, tenga scroll o no */
+  scrollbar-gutter: stable;
+}
+```
+
+Si quieres simetría (espacio a ambos lados), usa `scrollbar-gutter: stable both-edges`.
+
+## 5. Experiencia Nativa tipo App: `scroll-snap` ✨
+
+Carruseles, galerías, historias tipo Instagram... No necesitas 20kb de JavaScript para esto. CSS puede "imantar" el scroll a posiciones lógicas con una precisión de pixel perfecta.
+
+```css
+/* El Contenedor */
+.carrusel {
+  display: flex;
+  overflow-x: auto;
+  /* Eje X + 'mandatory' fuerza a terminar siempre en un slide completo */
+  scroll-snap-type: x mandatory;
+}
+
+/* Los Items */
+.slide {
+  flex: 0 0 100%;
+  /* Alineación: start, center, end */
+  scroll-snap-align: center;
+}
+```
+
+## Conclusión
+
+El scroll en el hilo principal (JavaScript) es costoso y propenso a errores. CSS hoy nos ofrece herramientas que se ejecutan en el compositor del navegador, garantizando 60fps incluso en móviles de gama baja.
+
+**Tu reto para hoy:**
+Abre tu proyecto actual y busca en tu archivo `main.js` o `utils.js`. Si encuentras funciones calculando alturas de encabezados o listeners de scroll para efectos visuales simples, **bórralos**. Reemplázalos con estas líneas de CSS. Tu código será más limpio y tus usuarios te lo agradecerán. 🚀

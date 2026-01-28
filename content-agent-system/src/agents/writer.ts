@@ -1,11 +1,12 @@
 
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { AgentState } from "../state";
 import { styles, WriterStyle } from "../prompts/styles";
 
+import { createModel } from "../models/factory";
+
 export const writerNode = async (state: typeof AgentState.State) => {
-    const model = new ChatGoogleGenerativeAI({ model: "gemini-3-pro-preview", temperature: 0.7 });
+    const model = createModel("writer", { temperature: 0.7 });
 
     const isRevision = state.revisionCount > 0 || !!state.critique;
     const styleKey = (state.writerStyle as WriterStyle) || "web-dev";

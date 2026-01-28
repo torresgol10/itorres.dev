@@ -1,14 +1,12 @@
 
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, ToolMessage } from "@langchain/core/messages";
 import { AgentState } from "../state";
 import { scrapeUrlTool } from "../tools/scrape";
 
+import { createModel } from "../models/factory";
+
 export const researcherNode = async (state: typeof AgentState.State) => {
-  const model = new ChatGoogleGenerativeAI({
-    model: "gemini-3-pro-preview",
-    temperature: 0
-  }).bindTools([scrapeUrlTool]);
+  const model = createModel("researcher", { temperature: 0, tools: [scrapeUrlTool] });
 
   console.log("--- Researcher Agent (Gemini): Analyzing request ---");
 
