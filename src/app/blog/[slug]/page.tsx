@@ -13,11 +13,13 @@ import {
     getAllPosts,
     extractToc,
     formatDate,
-    calculateReadingTime
+    calculateReadingTime,
+    getAdjacentPosts
 } from "@/lib/posts";
 import { ReadingProgress } from "@/components/ReadingProgress";
 import { ReadingTimeRemaining } from "@/components/ReadingTimeRemaining";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { PostNavigation } from "@/components/PostNavigation";
 import { rehypeExtractCode } from "@/lib/rehype-plugins";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
@@ -191,6 +193,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
                                 }}
                             />
                         </div>
+
+                        {/* Post Navigation */}
+                        <PostNavigation
+                            previousPost={getAdjacentPosts(slug).previous}
+                            nextPost={getAdjacentPosts(slug).next}
+                        />
                     </article>
 
                     {/* Right: Table of Contents (Desktop only) */}

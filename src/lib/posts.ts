@@ -107,6 +107,22 @@ export function getRelatedPosts(currentSlug: string, categories: string[], limit
         .slice(0, limit);
 }
 
+// Get previous and next posts for navigation
+export function getAdjacentPosts(currentSlug: string): { previous: PostMeta | null; next: PostMeta | null } {
+    const allPosts = getAllPosts(); // Already sorted by date desc
+    const currentIndex = allPosts.findIndex(post => post.slug === currentSlug);
+
+    if (currentIndex === -1) {
+        return { previous: null, next: null };
+    }
+
+    // Previous = newer post (lower index), Next = older post (higher index)
+    const previous = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+    const next = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+
+    return { previous, next };
+}
+
 // Extract TOC from markdown content
 export function extractToc(content: string): TocItem[] {
     const headingRegex = /^(#{2,3})\s+(.+)$/gm;
