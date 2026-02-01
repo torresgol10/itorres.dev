@@ -31,6 +31,14 @@ import { useMDXComponents } from "../../../../mdx-components";
 
 import { StructuredData } from "@/components/StructuredData";
 
+// Generate static params for all blog posts (enables static generation + cacheComponents)
+export async function generateStaticParams() {
+    const posts = getAllPosts(true); // Include drafts for preview builds
+    return posts.map((post) => ({
+        slug: post.slug,
+    }));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
     const post = getPostBySlug(slug);
