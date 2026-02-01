@@ -1,4 +1,5 @@
 
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { TableOfContents, MobileTableOfContents } from "@/components/TableOfContents";
@@ -193,13 +194,15 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
                         {/* MDX Content */}
                         <div className="prose-custom">
-                            <MDXRemote
-                                source={post.content}
-                                components={components}
-                                options={{
-                                    mdxOptions: mdxOptions as any
-                                }}
-                            />
+                            <Suspense fallback={<div className="animate-pulse space-y-4"><div className="h-4 bg-muted rounded w-3/4"></div><div className="h-4 bg-muted rounded w-full"></div><div className="h-4 bg-muted rounded w-5/6"></div></div>}>
+                                <MDXRemote
+                                    source={post.content}
+                                    components={components}
+                                    options={{
+                                        mdxOptions: mdxOptions as any
+                                    }}
+                                />
+                            </Suspense>
                         </div>
 
                         {/* Post Navigation */}
