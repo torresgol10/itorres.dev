@@ -12,6 +12,7 @@ export interface PostMeta {
     excerpt: string;
     image: string;
     imageAlt: string;
+    draft?: boolean;
     author?: {
         name: string;
         role: string;
@@ -69,6 +70,7 @@ export function getPostBySlug(slug: string): Post | null {
         excerpt: data.excerpt || data.description || "",
         image: data.image || "",
         imageAlt: data.imageAlt || data.title || "Blog post image",
+        draft: data.draft === true,
         author: data.author || {
             name: "Iván Torres",
             role: "Software Developer",
@@ -79,7 +81,9 @@ export function getPostBySlug(slug: string): Post | null {
 }
 
 // Get all posts sorted by date
-export function getAllPosts(): PostMeta[] {
+// In production, filter out drafts. In development, include them.
+export function getAllPosts(includeDrafts = false): PostMeta[] {
+    const isDevMode = process.env.NODE_ENV === "development";
     const slugs = getPostSlugs();
     const posts = slugs
         .map((slug) => {
@@ -89,7 +93,12 @@ export function getAllPosts(): PostMeta[] {
             const { content, ...meta } = post;
             return meta;
         })
-        .filter((post): post is PostMeta => post !== null)
+        .filter((post): post is PostMeta => {
+            if (post === null) return false;
+            // Include drafts only in dev mode or when explicitly requested
+            if (post.draft && !isDevMode && !includeDrafts) return false;
+            return true;
+        })
         .sort((a, b) => (new Date(b.date) > new Date(a.date) ? 1 : -1));
 
     return posts;
