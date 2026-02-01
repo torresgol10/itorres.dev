@@ -99,7 +99,7 @@ export function getAllPosts(includeDrafts = false): PostMeta[] {
             if (post.draft && !isDevMode && !includeDrafts) return false;
             return true;
         })
-        .sort((a, b) => (new Date(b.date) > new Date(a.date) ? 1 : -1));
+        .sort((a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : 0));
 
     return posts;
 }
