@@ -1,6 +1,7 @@
 
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { AgentState } from "../state";
+import { styles } from "../prompts/styles";
 
 import { createModel } from "../models/factory";
 
@@ -9,26 +10,34 @@ export const reflectorNode = async (state: typeof AgentState.State) => {
 
   console.log("--- Reflector Agent (Gemini): Critiquing ---");
 
-  const systemPrompt = `You are the strictest **Chief Editor** in the tech world.
-  Your job is to ensure posts follow the "Midudev/Senior" style rules.
+  const styleKey = (state.writerStyle as any) || "web-dev";
+  const selectedStylePrompt = (styles as any)[styleKey] || styles["web-dev"];
+
+  const systemPrompt = `Eres el **Editor en Jefe** más estricto del mundo tech.
+  Tu trabajo es asegurar que los posts sigan las REGLAS DE ESTILO definidas abajo.
+
+  ### EL ESTILO ELEGIDO:
+  ${selectedStylePrompt}
   
-  ### RULES TO VERIFY:
-  1. **Zero Fluff**: Does it start with greetings? Are there vague intros? (Must be removed).
-  2. **Structure**: 
-     - If short: Does it have Hook + Code + Senior Nuance?
-     - If long: Does it have Real Context + Steps + Best Practices (Good vs Bad)?
-  3. **Modern Code**: Does it use 'var'? Uses 2015 practices? (Must be current ES6+).
-  4. **Tone**: Is it boring? It should be enthusiastic and use emojis (unless style dictates otherwise).
+  ### VERIFICACIÓN CRÍTICA:
+  1. **Adherencia**: ¿El borrador sigue las "STYLE RULES" EXACTAMENTE?
+  2. **Sin Alucinaciones**: verifica la info de investigación.
+  3. **Formato**: El Markdown debe estar limpio.
+  4. **Frontmatter**: ¿Está presente la metadata?
+  5. **Idioma**: ¿Está escrito en ESPAÑOL?
   
-  If the draft meets all these criteria and is excellent: respond only "PERFECT".
-  If it fails at something: List specific errors for the writer to fix. Be direct and harsh.
+  Si el estilo dice "NO EMOJIS", entonces CUALQUIER emoji es un FALLO.
+  Si el estilo dice "Zero Fluff", entonces "Hola amigos" es un FALLO.
+
+  Si el borrador cumple todo y es excelente: responde solo "PERFECT".
+  Si falla en algo: Lista los errores específicos para que el escritor los arregle. Sé directo y duro. Responde en ESPAÑOL.
   `;
 
-  const userContent = `Critique this draft about "${state.topic}":
+  const userContent = `Critica este borrador sobre "${state.topic}":
   
   ${state.draft}
   
-  Research info (to verify accuracy):
+  Info de investigación (para verificar precisión):
   ${state.researchData}`;
 
   const response = await model.invoke([

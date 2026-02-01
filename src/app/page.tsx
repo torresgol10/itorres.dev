@@ -82,21 +82,26 @@ export default function Home() {
             <h2 className="text-2xl font-bold tracking-tight">Últimos artículos</h2>
             <Link
               href="/blog"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
             >
               Ver todos →
             </Link>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
-            {posts.map((post) => (
-              <PostCard
+            {posts.map((post, index) => (
+              <div
                 key={post.slug}
-                slug={post.slug}
-                title={post.title}
-                excerpt={post.excerpt}
-                date={formatDate(post.date)}
-                categories={post.categories}
-              />
+                className="animate-fadeIn"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <PostCard
+                  slug={post.slug}
+                  title={post.title}
+                  excerpt={post.excerpt}
+                  date={formatDate(post.date)}
+                  categories={post.categories}
+                />
+              </div>
             ))}
           </div>
         </section>

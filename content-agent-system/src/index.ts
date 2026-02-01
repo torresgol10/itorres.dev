@@ -82,26 +82,89 @@ const workflow = new StateGraph(AgentState)
 
 const app = workflow.compile();
 
+// ... imports
+import inquirer from "inquirer";
+
+// ... existing code ...
+
 async function main() {
-    const input = process.argv[2] || "Explain React 19 features";
-    const style = process.argv[3] || "web-dev";
+    let input = process.argv[2];
+    let style = process.argv[3];
+
+    // Interactive Mode if no args provided
+    if (!input) {
+        console.log("\n🚀 Content Agent System - Interactive Mode\n");
+
+        const answers = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'action',
+                message: 'What do you want to do?',
+                choices: [
+                    { name: '✨ Create New Post', value: 'create' },
+                    { name: '🔍 Review/Improve Existing Post', value: 'review' }
+                ]
+            },
+            {
+                type: 'input',
+                name: 'topic',
+                message: 'Enter the Topic describe what you want:',
+                when: (answers: any) => answers.action === 'create',
+                validate: (input: string) => input ? true : 'Topic is required'
+            },
+            {
+                type: 'input',
+                name: 'filePath',
+                message: 'Enter the Absolute File Path to review:',
+                when: (answers: any) => answers.action === 'review',
+                validate: (input: string) => input ? true : 'File path is required'
+            },
+            {
+                type: 'list',
+                name: 'style',
+                message: 'Select Writing Style:',
+                choices: [
+                    { name: 'vercel-web-dev (Technical, No Emojis)', value: 'web-dev' },
+                    // Keeping other options hidden as per user request, but code allows expansion
+                ],
+                default: 'web-dev'
+            }
+        ]);
+
+        if (answers.action === 'create') {
+            input = answers.topic;
+        } else {
+            input = answers.filePath;
+        }
+        style = answers.style;
+    }
+
+    style = style || "web-dev";
 
     // Check if input contains url roughly
     const hasUrl = input.includes("http");
 
-    console.log(`Starting request: "${input}" [Style: ${style}]\n`);
+    console.log(`\nStarting request: "${input}" [Style: ${style}]\n`);
 
     let initialDraft = "";
     let effectiveTopic = input;
 
     // Simple check: if input is a local file that exists, read it
-    if (input.endsWith(".md") || input.endsWith(".mdx")) {
+    const isFile = input.endsWith(".md") || input.endsWith(".mdx") || (input.includes(":") && !input.startsWith("http")); // Naive absolute path check
+
+    if (isFile) {
         try {
-            initialDraft = await fs.readFile(input, "utf-8");
-            console.log(`--- Detected file input. Reviewing ${input} ---`);
-            effectiveTopic = `Reviewing existing post: ${input}`;
+            // Trim quotes if user pasted path with quotes
+            const cleanPath = input.replace(/['"]/g, '');
+            initialDraft = await fs.readFile(cleanPath, "utf-8");
+            console.log(`--- Detected file input. Reviewing ${cleanPath} ---`);
+            effectiveTopic = `Reviewing existing post: ${cleanPath}`;
+            input = cleanPath; // update input to clean path
         } catch (e) {
-            // Not a file or can't read, treat as topic
+            // Not a file or can't read, treat as topic if action was create, or error if review
+            if (!input.includes(" ")) {
+                console.warn(`⚠️  Warning: Could not read file '${input}'. Treating as topic.`);
+            }
         }
     }
 
@@ -116,15 +179,20 @@ async function main() {
         topic: effectiveTopic,
         draft: initialDraft,
         writerStyle: style,
+        filePath: isFile ? input : "",
     } as any;
+
+    // ... rest of the function ...
 
     const stream = await app.stream(initialInputs, { recursionLimit: 50 });
 
     let finalDraft = "";
+    let finalState: any = {};
 
     for await (const update of stream) {
         const nodeName = Object.keys(update)[0];
         const nodeState = update[nodeName];
+        finalState = nodeState; // Capture latest state
         // console.log(`Update ${nodeName}`);
         if (nodeName === "writer") {
             console.log("\n--- DRAFT GENERATED ---");
@@ -149,7 +217,19 @@ async function main() {
             .replace(/^-+/, '')
             .replace(/-+$/, '');
 
-        const outputPath = `${slugify(extractedTitle)}.mdx`;
+        // If reviewing, use existing path. Else create new slug.
+        // Check if finalState has filePath (it might be nested depending on how langgraph returns updates)
+        // Actually, stream returns partial updates. We need to rely on our initial input logic or if we can access final state better.
+        // But simply, we can check if 'isFile' was true at start and use process.argv or 'input' variable which we cleaned.
+
+        let outputPath = "";
+        if (isFile && input) {
+            outputPath = input;
+            console.log(`\n--- Overwriting existing file: ${outputPath} ---`);
+        } else {
+            outputPath = `${slugify(extractedTitle)}.mdx`;
+        }
+
         await fs.writeFile(outputPath, finalDraft);
         console.log(`\n--- Result saved to ${outputPath} ---`);
     }

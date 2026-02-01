@@ -31,8 +31,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 ? children.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")
                 : undefined;
             return (
-                <h2 id={id} className="text-2xl font-bold tracking-tight mt-10 mb-4" {...props}>
+                <h2 id={id} className="group flex items-center gap-2 text-2xl font-bold tracking-tight mt-10 mb-4 cursor-pointer" {...props}>
                     {children}
+                    <a href={`#${id}`} className="opacity-0 group-hover:opacity-100 transition-opacity text-primary/50 hover:text-primary no-underline">#</a>
                 </h2>
             );
         },
@@ -41,14 +42,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 ? children.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")
                 : undefined;
             return (
-                <h3 id={id} className="text-xl font-semibold mt-8 mb-3" {...props}>
+                <h3 id={id} className="group flex items-center gap-2 text-xl font-semibold mt-8 mb-3 cursor-pointer" {...props}>
                     {children}
+                    <a href={`#${id}`} className="opacity-0 group-hover:opacity-100 transition-opacity text-primary/50 hover:text-primary no-underline">#</a>
                 </h3>
             );
         },
         // Paragraphs
         p: ({ children }) => (
-            <p className="mb-6 leading-7 text-foreground/90">{children}</p>
+            <p className="mb-6 leading-8 text-foreground/90">{children}</p>
         ),
         // Code blocks
         pre: ({ children, ...props }) => {
@@ -75,22 +77,22 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             }
             // Inline code
             return (
-                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono">
+                <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary border border-border">
                     {children}
                 </code>
             );
         },
         // Lists
         ul: ({ children }) => (
-            <ul className="mb-6 ml-6 list-disc space-y-2">{children}</ul>
+            <ul className="mb-6 ml-6 list-disc space-y-2 marker:text-primary/70">{children}</ul>
         ),
         ol: ({ children }) => (
-            <ol className="mb-6 ml-6 list-decimal space-y-2">{children}</ol>
+            <ol className="mb-6 ml-6 list-decimal space-y-2 marker:text-primary/70">{children}</ol>
         ),
-        li: ({ children }) => <li className="leading-7">{children}</li>,
+        li: ({ children }) => <li className="leading-7 pl-1">{children}</li>,
         // Blockquote
         blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-primary/50 pl-4 my-6 italic text-muted-foreground">
+            <blockquote className="border-l-4 border-primary bg-muted/40 pl-6 py-4 my-8 italic text-muted-foreground rounded-r-lg">
                 {children}
             </blockquote>
         ),

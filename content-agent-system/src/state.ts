@@ -31,4 +31,8 @@ export const AgentState = Annotation.Root({
         reducer: (x, y) => y ?? x,
         default: () => "web-dev",
     }),
+    filePath: Annotation<string>({
+        reducer: (x, y) => y ?? x,
+        default: () => "",
+    }),
 });

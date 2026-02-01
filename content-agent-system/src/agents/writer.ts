@@ -44,25 +44,33 @@ Analyze the input and choose:
 - **Tone:** Technical, modern, enthusiastic.
 - **Code:** Specify language. Use ES6+, semantic HTML, modern CSS.
 - **Philosophy:** How it is used TODAY in production. No irrelevant history.
+- **Language:** SPANISH (Español). Write EVERYTHING in Spanish.
 
 ### SOURCES
 Use this researched information (if applicable) but DO NOT mention "I searched on the internet":
 ${state.researchData}
+
+### CRITICAL OUTPUT INSTRUCTIONS
+- Output ONLY the raw markdown content.
+- Do NOT output the prompt itself.
+- Do NOT wrap the content in \`\`\`markdown code blocks.
+- Do NOT add any preamble like "Here is the post:" or "I have updated...".
+- Do NOT include any "internal reasoning" or "plan". JUST THE POST.
 `;
 
     let userContent = "";
 
     if (isRevision) {
-        userContent = `Refine the previous post based strictly on this CRITIQUE:
+        userContent = `Refina el post anterior basándote estrictamente en esta CRÍTICA:
     ${state.critique}
     
-    PREVIOUS POST:
+    POST ANTERIOR:
     ${state.draft}
     
-    Maintain the style and fix ONLY what is necessary.`;
+    Mantén el estilo y arregla SOLO lo necesario. Genera el post completo corregido. NO agregues texto extra.`;
     } else {
-        userContent = `Write a post about: "${state.topic}". 
-    Decide yourself if MICRO MODE or DEEP MODE is appropriate for the topic.`;
+        userContent = `Escribe un post sobre: "${state.topic}". 
+    Decide tú mismo si usar MICRO MODE o DEEP MODE según sea apropiado para el tema.`;
     }
 
     const response = await model.invoke([
@@ -70,8 +78,15 @@ ${state.researchData}
         new HumanMessage(userContent)
     ]);
 
+    // Clean output: Remove any preamble before the first "---"
+    let content = response.content as string;
+    const frontmatterStart = content.indexOf("---");
+    if (frontmatterStart > 0) {
+        content = content.substring(frontmatterStart);
+    }
+
     return {
-        draft: response.content as string,
+        draft: content,
         revisionCount: isRevision ? state.revisionCount + 1 : 1,
         messages: [response],
     };
