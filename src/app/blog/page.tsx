@@ -5,6 +5,9 @@ import { getAllPosts } from "@/lib/posts";
 export const metadata = {
     title: "Blog - Iván Torres",
     description: "Explora todos mis artículos sobre desarrollo web, react y tecnología.",
+    alternates: {
+        canonical: "/blog",
+    },
 };
 
 export default function BlogPage() {
