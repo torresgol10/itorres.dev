@@ -65,7 +65,7 @@ export function getPostBySlug(slug: string): Post | null {
     return {
         slug: realSlug,
         title: data.title || "Untitled",
-        date: data.date || new Date().toISOString(),
+        date: data.date || "1970-01-01",
         categories,
         excerpt: data.excerpt || data.description || "",
         image: data.image || "",
