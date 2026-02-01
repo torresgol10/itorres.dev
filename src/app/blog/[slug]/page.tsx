@@ -25,6 +25,8 @@ import { useMDXComponents } from "../../../../mdx-components";
 
 // ...
 
+import { StructuredData } from "@/components/StructuredData";
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const { slug } = await params;
     const post = getPostBySlug(slug);
@@ -108,6 +110,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     return (
         <div className="min-h-screen bg-background antialiased">
             <ReadingProgress />
+            <StructuredData post={post} />
             <Header />
 
             {/* Mobile TOC - sticky below header */}

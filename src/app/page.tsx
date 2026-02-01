@@ -9,6 +9,21 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background antialiased">
       <Header />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            url: "https://itorres.dev",
+            name: "Iván Torres | Software Developer",
+            author: {
+              "@type": "Person",
+              name: "Iván Torres",
+            },
+          }),
+        }}
+      />
 
       <main className="mx-auto max-w-5xl px-6">
         {/* Hero Section */}
