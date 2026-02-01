@@ -148,14 +148,18 @@ export function extractToc(content: string): TocItem[] {
     return toc;
 }
 
-// Format date for display
+// Format date for display (static implementation to avoid Date.now() during SSG)
+const SPANISH_MONTHS = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+];
+
 export function formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-    });
+    // Parse ISO date string directly to avoid Date.now() calls
+    const [year, month, day] = dateString.split(/[-T]/);
+    const monthIndex = parseInt(month, 10) - 1;
+    const dayNum = parseInt(day, 10);
+    return `${dayNum} de ${SPANISH_MONTHS[monthIndex]} de ${year}`;
 }
 
 // Calculate reading time
