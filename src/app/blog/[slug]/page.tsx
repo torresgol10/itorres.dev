@@ -16,6 +16,8 @@ import {
     calculateReadingTime
 } from "@/lib/posts";
 import { ReadingProgress } from "@/components/ReadingProgress";
+import { ReadingTimeRemaining } from "@/components/ReadingTimeRemaining";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { rehypeExtractCode } from "@/lib/rehype-plugins";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
@@ -83,6 +85,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
 
     const tocItems = extractToc(post.content);
     const readingTime = calculateReadingTime(post.content);
+    const readingMinutes = parseInt(readingTime) || 5;
     const relatedPosts = getRelatedPosts(slug, post.categories, 3);
     const components = useMDXComponents({ h1: () => null });
 
@@ -110,6 +113,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     return (
         <div className="min-h-screen bg-background antialiased">
             <ReadingProgress />
+            <ReadingTimeRemaining totalMinutes={readingMinutes} />
             <StructuredData post={post} />
             <Header />
 
@@ -117,14 +121,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             <MobileTableOfContents items={tocItems} />
 
             <main className="mx-auto max-w-6xl px-6 py-10">
-                {/* Back button */}
-                <Link
-                    href="/"
-                    className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                    <ArrowLeft className="h-4 w-4" />
-                    Volver al blog
-                </Link>
+                {/* Breadcrumbs */}
+                <Breadcrumbs
+                    items={[
+                        { label: "Inicio", href: "/" },
+                        { label: "Blog", href: "/blog" },
+                        { label: post.title },
+                    ]}
+                />
 
                 {/* Two column layout: Article left, TOC right */}
                 <div className="xl:grid xl:grid-cols-[1fr_200px] xl:gap-12">
